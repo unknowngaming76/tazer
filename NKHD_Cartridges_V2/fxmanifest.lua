@@ -17,12 +17,3 @@ client_scripts {
 shared_scripts {
     'config.lua'
 }
-
-ui_page 'html/ui.html'
-
-files {
-    'html/ui.html',
-    'html/css/style.css',
-    'html/js/script.js',
-    'html/img/*.png'
-}
