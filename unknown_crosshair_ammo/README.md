@@ -5,7 +5,7 @@ Standalone FiveM resource that draws a simple crosshair and an ammo counter when
 ## Features
 - Crosshair appears whenever a gun is out (default), or only while aiming (configurable).
 - Ammo text shown at the top-right by default: `clip | reserve`.
-- Optionally hides GTA’s default reticle to prevent double-reticles.
+- Optionally hides GTA’s default reticle and ammo HUD to prevent duplicates.
 - No framework dependency (works with Qbox/QBCore/ESX/standalone).
 - Lightweight: no NUI, drawn via natives.
 
@@ -18,6 +18,7 @@ Standalone FiveM resource that draws a simple crosshair and an ammo counter when
 See `config.lua`:
 - `crosshair.showWhenAimingOnly = false` (set `true` if you only want it while aiming).
 - Tweak `size`, `thickness`, `gap`, `alpha` for the crosshair.
+- `ammo.hideDefault = true` to hide GTA's default ammo display while this resource is active.
 - Move ammo display by changing `ammo.x`, `ammo.y`, `ammo.scale`.
 
 ## Commands

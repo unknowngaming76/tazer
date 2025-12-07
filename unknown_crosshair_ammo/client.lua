@@ -123,6 +123,11 @@ CreateThread(function()
                 DrawCrosshair()
             end
 
+            if config.ammo.hideDefault then
+                HideHudComponentThisFrame(2)  -- weapon icon & ammo
+                HideHudComponentThisFrame(20) -- weapon stats (ammo display)
+            end
+
             if config.ammo.enabled then
                 local clip, reserve = GetAmmoNumbers(ped, weaponHash)
                 if weaponHash == `WEAPON_STUNGUN` and taserAmmoOverride.active then
