@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Framework = 'auto' -- 'auto', 'ESX' or 'QBCore'
+Config.Framework = 'auto' -- 'auto', 'ESX', 'QBCore', or 'ox_inventory'
 Config.Debug = false
 Config.SpamCooldown = 2000 -- 2000 = 2 Sekunden
 
@@ -12,6 +12,9 @@ Config.ESXItemName = 'taser_cartridge'
 
 -- QBCore
 Config.QBCoreItemName = 'taser_ammo'
+
+-- ox_inventory
+Config.OxInventoryItemName = 'taser_cartridge'
 
 -- Performance
 Config.NonTaserTickRate = 250 -- ms (poll faster when taser isn't equipped)
