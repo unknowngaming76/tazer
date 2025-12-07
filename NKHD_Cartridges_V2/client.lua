@@ -5,11 +5,10 @@ local SpamCooldownPressed = false
 local isTaserEquipped = false
 local playerPed = nil
 local availableCartridges = 0
-local displayUI = false
 
 local TASER_HASH = GetHashKey('WEAPON_STUNGUN')
 
-function ShowNotification(text)
+local function ShowNotification(text)
     if Config.EnableUI == false then
         SetNotificationTextEntry("STRING")
         AddTextComponentString(text)
@@ -17,36 +16,9 @@ function ShowNotification(text)
     end
 end
 
-function UpdateTaserUI()
-    SendNUIMessage({
-        type = 'updateTaserUI',
-        currentCartridges = cartridges,
-        maxCartridges = Config.MaxCartridges,
-        availableCartridges = availableCartridges
-    })
-    displayUI = true
+local function UpdateCrosshairAmmo()
+    TriggerEvent('unknown_crosshair_ammo:setTaserAmmo', cartridges, availableCartridges)
 end
-
-function HideTaserUI()
-    if displayUI then
-        SendNUIMessage({
-            type = 'hideTaserUI'
-        })
-        displayUI = false
-    end
-end
-
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(Config.UIRefreshRate)
-        
-        if Config.EnableUI and isTaserEquipped then
-            UpdateTaserUI()
-        elseif displayUI then
-            HideTaserUI()
-        end
-    end
-end)
 
 RegisterNetEvent('spam')
 AddEventHandler('spam', function()
@@ -62,9 +34,7 @@ RegisterNetEvent('updateTaserCartridgesCount')
 AddEventHandler('updateTaserCartridgesCount', function(cartridgesCount)
     availableCartridges = cartridgesCount
 
-    if Config.EnableUI and isTaserEquipped then
-        UpdateTaserUI()
-    end
+    UpdateCrosshairAmmo()
 end)
 
 RegisterNetEvent('reloadTaser')
@@ -82,9 +52,7 @@ AddEventHandler('reloadTaser', function(hasCartridge, cartridgesAvailable)
         availableCartridges = cartridgesAvailable
     end
 
-    if Config.EnableUI and isTaserEquipped then
-        UpdateTaserUI()
-    end
+    UpdateCrosshairAmmo()
     
     TriggerEvent('spam')
 end)
@@ -94,18 +62,22 @@ Citizen.CreateThread(function()
         playerPed = PlayerPedId() 
         local currentWeapon = GetSelectedPedWeapon(playerPed)
         local wasTaserEquipped = isTaserEquipped
-     
+
         isTaserEquipped = (currentWeapon == TASER_HASH)
 
         if isTaserEquipped and not wasTaserEquipped then
             TriggerServerEvent('checkTaserCartridgesCount')
+            UpdateCrosshairAmmo()
         end
 
         if isTaserEquipped then
+            HideHudComponentThisFrame(2)
+            HideHudComponentThisFrame(20)
+
             if cartridges <= 0 then
-                DisableControlAction(0, 24, true)   
-                DisableControlAction(0, 257, true)     
-                DisableControlAction(0, 142, true)    
+                DisableControlAction(0, 24, true)
+                DisableControlAction(0, 257, true)
+                DisableControlAction(0, 142, true)
                 SetPedInfiniteAmmo(playerPed, false, TASER_HASH)
 
                 if not NoCartgridgesMessage then
@@ -126,10 +98,8 @@ Citizen.CreateThread(function()
             if IsPedShooting(playerPed) and cartridges > 0 then
                 cartridges = cartridges - 1
 
-                if Config.EnableUI then
-                    UpdateTaserUI()
-                end
-                
+                UpdateCrosshairAmmo()
+
                 if cartridges <= 0 and not NoCartgridgesMessage then
                     cartridgesin = false
                     NoCartgridgesMessage = true

@@ -16,7 +16,5 @@ Config.QBCoreItemName = 'taser_ammo'
 -- Performance
 Config.NonTaserTickRate = 500 -- ms
 
--- UI
-Config.EnableUI = true -- UI
-Config.UIRefreshRate = 1000 -- UI-Refreshtime
-Config.UILowAmmoThreshold = 0.3 -- (0.3 = 30%) -> when the Number gets Yellow
+-- UI (disabled; ammo is shown via unknown_crosshair_ammo instead)
+Config.EnableUI = false

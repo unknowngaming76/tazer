@@ -7,6 +7,26 @@ end
 -- Crosshair visibility state
 local crosshairEnabled = true
 
+-- Optional override for taser cartridges provided by NKHD_Cartridges_V2
+local taserAmmoOverride = {
+    active = false,
+    clip = 0,
+    reserve = 0
+}
+
+RegisterNetEvent('unknown_crosshair_ammo:setTaserAmmo', function(clip, reserve)
+    if clip == nil or reserve == nil then
+        taserAmmoOverride.active = false
+        taserAmmoOverride.clip = 0
+        taserAmmoOverride.reserve = 0
+        return
+    end
+
+    taserAmmoOverride.active = true
+    taserAmmoOverride.clip = clip
+    taserAmmoOverride.reserve = reserve
+end)
+
 -- Command to toggle it on/off
 RegisterCommand('togglecrosshair', function()
     crosshairEnabled = not crosshairEnabled
@@ -105,6 +125,10 @@ CreateThread(function()
 
             if config.ammo.enabled then
                 local clip, reserve = GetAmmoNumbers(ped, weaponHash)
+                if weaponHash == `WEAPON_STUNGUN` and taserAmmoOverride.active then
+                    clip = taserAmmoOverride.clip or 0
+                    reserve = taserAmmoOverride.reserve or 0
+                end
                 local txt = ("%d | %d"):format(clip, reserve)
                 if config.ammo.showWeaponName then
                     txt = (tostring(weaponHash) .. "  " .. txt)
