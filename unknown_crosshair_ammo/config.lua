@@ -19,6 +19,7 @@ config.crosshair = {
 config.ammo = {
     enabled = true,
     showWeaponName = false,        -- include weapon label (hash) before the ammo
+    hideDefault = true,            -- hide GTA's built-in ammo HUD when a firearm is out
     x = 0.985,                     -- top-right
     y = 0.02,
     scale = 0.5,                   -- text scale
