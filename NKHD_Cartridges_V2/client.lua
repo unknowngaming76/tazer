@@ -5,6 +5,7 @@ local SpamCooldownPressed = false
 local isTaserEquipped = false
 local playerPed = nil
 local availableCartridges = 0
+local reloadEmotePlaying = false
 
 local TASER_HASH = GetHashKey('WEAPON_STUNGUN')
 
@@ -14,6 +15,31 @@ local function ShowNotification(text)
         AddTextComponentString(text)
         DrawNotification(false, false)
     end
+end
+
+local function StopReloadEmote()
+    if reloadEmotePlaying then
+        playerPed = playerPed or PlayerPedId()
+        ClearPedSecondaryTask(playerPed)
+        reloadEmotePlaying = false
+    end
+end
+
+local function PlayReloadEmote()
+    if reloadEmotePlaying then return end
+
+    playerPed = playerPed or PlayerPedId()
+
+    local animDict = 'random@arrests'
+    local animName = 'generic_radio_chatter'
+
+    RequestAnimDict(animDict)
+    while not HasAnimDictLoaded(animDict) do
+        Citizen.Wait(0)
+    end
+
+    TaskPlayAnim(playerPed, animDict, animName, 8.0, -8.0, -1, 49, 0, false, false, false)
+    reloadEmotePlaying = true
 end
 
 local function UpdateCrosshairAmmo()
@@ -44,8 +70,10 @@ AddEventHandler('reloadTaser', function(hasCartridge, cartridgesAvailable)
         cartridges = Config.MaxCartridges
         ShowNotification('~g~Taser Reloaded')
         NoCartgridgesMessage = false
+        StopReloadEmote()
     else
         ShowNotification('~r~There are no Cartridges left.')
+        StopReloadEmote()
     end
 
     if cartridgesAvailable ~= nil then
@@ -59,7 +87,7 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        playerPed = PlayerPedId() 
+        playerPed = PlayerPedId()
         local currentWeapon = GetSelectedPedWeapon(playerPed)
         local wasTaserEquipped = isTaserEquipped
 
@@ -73,6 +101,8 @@ Citizen.CreateThread(function()
         if isTaserEquipped then
             HideHudComponentThisFrame(2)
             HideHudComponentThisFrame(20)
+            HideHudComponentThisFrame(14)
+            HideHudComponentThisFrame(9)
 
             if cartridges <= 0 then
                 DisableControlAction(0, 24, true)
@@ -87,11 +117,16 @@ Citizen.CreateThread(function()
                 end
             end
 
-            if not cartridgesin and IsControlJustReleased(0, Config.ReloadKey) and not SpamCooldownPressed then
+            local needsReload = cartridges < Config.MaxCartridges
+
+            if needsReload and IsControlJustReleased(0, Config.ReloadKey) and not SpamCooldownPressed then
                 SpamCooldownPressed = true
+
                 if Config.Debug then
-                    print('Debug Pressed R')
+                    print('Debug Pressed R (taser reload)')
                 end
+
+                PlayReloadEmote()
                 TriggerServerEvent('checkTaserCartridges')
             end
 
@@ -106,14 +141,15 @@ Citizen.CreateThread(function()
                     ShowNotification('~r~Out of cartridges! Press R to reload.')
                 end
             end
-            
-            Citizen.Wait(0) 
+
+            Citizen.Wait(0)
         else
 
             if wasTaserEquipped then
+                StopReloadEmote()
             end
-            
-            Citizen.Wait(500) 
+
+            Citizen.Wait(Config.NonTaserTickRate)
         end
     end
 end)

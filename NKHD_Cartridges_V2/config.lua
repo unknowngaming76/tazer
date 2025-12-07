@@ -14,7 +14,7 @@ Config.ESXItemName = 'taser_cartridge'
 Config.QBCoreItemName = 'taser_ammo'
 
 -- Performance
-Config.NonTaserTickRate = 500 -- ms
+Config.NonTaserTickRate = 250 -- ms (poll faster when taser isn't equipped)
 
 -- UI (disabled; ammo is shown via unknown_crosshair_ammo instead)
 Config.EnableUI = false
